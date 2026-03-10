@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // ─── Private constructor ─────────────────────────────────────────
@@ -90,18 +91,28 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: background,
+
+      // ── Apply JetBrains Mono to entire app ──
+      textTheme: GoogleFonts.jetBrainsMonoTextTheme(
+        ThemeData.dark().textTheme,
+      ),
+
       colorScheme: const ColorScheme.dark(
         primary: primary,
         secondary: accent,
         surface: surface,
         background: background,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: background,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: headingSmall,
-        iconTheme: IconThemeData(color: textPrimary),
+        titleTextStyle: GoogleFonts.jetBrainsMono(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+        iconTheme: const IconThemeData(color: textPrimary),
       ),
       cardTheme: const CardThemeData(
         color: cardBackground,
@@ -119,4 +130,6 @@ class AppTheme {
   static Color getTagColor(String tag) {
     return tagColors[tag] ?? primary;
   }
+
+  
 }

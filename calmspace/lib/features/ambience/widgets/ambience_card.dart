@@ -40,6 +40,7 @@ class AmbienceCard extends StatelessWidget {
                   Image.asset(
                     ambience.imagePath,
                     fit: BoxFit.cover,
+                    cacheWidth: 400,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: AppTheme.surface,

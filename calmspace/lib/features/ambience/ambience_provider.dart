@@ -13,6 +13,7 @@ final ambienceRepositoryProvider = Provider<AmbienceRepository>((ref) {
 // FutureProvider is still correct here in Riverpod 3.x
 final ambiencesProvider = FutureProvider<List<Ambience>>((ref) async {
   final repository = ref.watch(ambienceRepositoryProvider);
+    ref.keepAlive(); 
   return repository.loadAmbiences();
 });
 
