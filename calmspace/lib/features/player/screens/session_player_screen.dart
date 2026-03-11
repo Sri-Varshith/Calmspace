@@ -4,6 +4,7 @@ import '../../../data/models/ambience.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../audio_service.dart';
 import '../player_provider.dart';
+import 'package:just_audio/just_audio.dart';
 
 class SessionPlayerScreen extends ConsumerStatefulWidget {
   final Ambience ambience;
@@ -202,27 +203,71 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
           ),
 
           // ── Breathing Animation ────────────────────────
-          Center(
-            child: AnimatedBuilder(
-              animation: _breathingAnimation,
-              builder: (context, child) {
-                return Container(
-                  width: 220,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppTheme.primary
-                            .withOpacity(_breathingAnimation.value),
-                        Colors.transparent,
+              Center(
+                child: AnimatedBuilder(
+                  animation: _breathingAnimation,
+                  builder: (context, child) {
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Outer ring
+                        Container(
+                          width: 280 * _breathingAnimation.value + 100,
+                          height: 280 * _breathingAnimation.value + 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                AppTheme.primary.withOpacity(0.05),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Middle ring
+                        Container(
+                          width: 180 * _breathingAnimation.value + 80,
+                          height: 180 * _breathingAnimation.value + 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                AppTheme.primary.withOpacity(0.1),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Inner glowing core
+                        Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                AppTheme.primary
+                                    .withOpacity(_breathingAnimation.value * 0.8),
+                                AppTheme.accent
+                                    .withOpacity(_breathingAnimation.value * 0.4),
+                                Colors.transparent,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primary
+                                    .withOpacity(_breathingAnimation.value * 0.5),
+                                blurRadius: 30,
+                                spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+                    );
+                  },
+                ),
+              ),
 
           // ── Main Content ───────────────────────────────
           SafeArea(
@@ -341,35 +386,40 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                       const SizedBox(height: AppTheme.spacingLG),
 
                       // Play/Pause button
-                      GestureDetector(
-                        onTap: () async {
-                          await _audioService.togglePlayPause();
-                          ref
-                              .read(sessionProvider.notifier)
-                              .togglePlayPause();
-                        },
-                        child: Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primary.withOpacity(0.4),
-                                blurRadius: 20,
-                                spreadRadius: 2,
+                      // Play/Pause button
+                      StreamBuilder<PlayerState>(
+                        stream: _audioService.playerStateStream,
+                        builder: (context, snapshot) {
+                          final isPlaying = snapshot.data?.playing ?? false;
+                          return GestureDetector(
+                            onTap: () async {
+                              await _audioService.togglePlayPause();
+                              ref.read(sessionProvider.notifier).togglePlayPause();
+                            },
+                            child: Container(
+                              width: 72,
+                              height: 72,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primary.withOpacity(0.4),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Icon(
-                            session.isPlaying
-                                ? Icons.pause_rounded
-                                : Icons.play_arrow_rounded,
-                            color: AppTheme.background,
-                            size: 36,
-                          ),
-                        ),
+                              child: Icon(
+                                isPlaying
+                                    ? Icons.pause_rounded
+                                    : Icons.play_arrow_rounded,
+                                color: AppTheme.background,
+                                size: 36,
+                              ),
+                            ),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: AppTheme.spacingXL),
