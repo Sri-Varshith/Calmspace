@@ -7,6 +7,7 @@ class AudioService {
   final AudioPlayer _player = AudioPlayer();
 
   Future<void> loadAndPlay(String audioPath) async {
+    await _player.stop();
     await _player.setAsset(audioPath);
     await _player.setLoopMode(LoopMode.one);
     await _player.play();
@@ -29,9 +30,7 @@ class AudioService {
     await _player.seek(Duration.zero);
   }
 
-  Stream<Duration> get positionStream => _player.positionStream;
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
-  Duration get duration => _player.duration ?? Duration.zero;
   bool get isPlaying => _player.playing;
 
   void dispose() {
