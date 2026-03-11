@@ -9,10 +9,12 @@ import 'dart:async';
 
 class SessionPlayerScreen extends ConsumerStatefulWidget {
   final Ambience ambience;
+    final bool resuming;
 
   const SessionPlayerScreen({
     super.key,
     required this.ambience,
+    this.resuming=false,
   });
 
   @override
@@ -33,12 +35,22 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
   bool _sessionEnded = false;
   Timer? _sessionTimer;
 
-  @override
-  void initState() {
-    super.initState();
-    _setupBreathingAnimation();
+@override
+void initState() {
+  super.initState();
+  _setupBreathingAnimation();
+
+  if (widget.resuming) {
+    // Session already running - just restore elapsed seconds
+    // and continue timer from where it left off
+    final session = ref.read(sessionProvider);
+    _elapsedSeconds = session.elapsedSeconds;
+    _startTimer();
+  } else {
+    // Fresh session start
     _startSession();
   }
+}
 
   void _setupBreathingAnimation() {
     _breathingController = AnimationController(
@@ -58,7 +70,7 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
 Future<void> _startSession() async {
   await _audioService.loadAndPlay(widget.ambience.audioPath);
   ref.read(sessionProvider.notifier).startSession(widget.ambience);
-  _startTimer(); // ← only this, remove everything below it
+  _startTimer();
 }
 
   void _onSessionComplete() {

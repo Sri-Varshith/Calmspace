@@ -5,6 +5,7 @@ import '../widgets/ambience_card.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/tag_filter_chips.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../player/widgets/mini_player.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,12 +14,15 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filteredAsync = ref.watch(filteredAmbiencesProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
+return Scaffold(
+  body: SafeArea(
+    child: Stack(
+      children: [
+        // ── Main Content ──────────────────────────
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────
+            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppTheme.spacingMD,
@@ -29,20 +33,14 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'CalmSpace',
-                    style: AppTheme.headingLarge,
-                  ),
+                  Text('CalmSpace', style: AppTheme.headingLarge),
                   const SizedBox(height: AppTheme.spacingXS),
-                  Text(
-                    'Choose your ambience',
-                    style: AppTheme.bodyMedium,
-                  ),
+                  Text('Choose your ambience', style: AppTheme.bodyMedium),
                 ],
               ),
             ),
 
-            // ── Search Bar ───────────────────────────────────
+            // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppTheme.spacingMD,
@@ -52,17 +50,15 @@ class HomeScreen extends ConsumerWidget {
 
             const SizedBox(height: AppTheme.spacingMD),
 
-            // ── Tag Filter Chips ─────────────────────────────
+            // Tag Filter Chips
             Padding(
-              padding: const EdgeInsets.only(
-                left: AppTheme.spacingMD,
-              ),
+              padding: const EdgeInsets.only(left: AppTheme.spacingMD),
               child: const TagFilterChips(),
             ),
 
             const SizedBox(height: AppTheme.spacingMD),
 
-            // ── Ambience Grid ────────────────────────────────
+            // Ambience Grid
             Expanded(
               child: filteredAsync.when(
                 loading: () => const Center(
@@ -78,7 +74,6 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 data: (ambiences) {
-                  // ── Empty State ────────────────────────────
                   if (ambiences.isEmpty) {
                     return Center(
                       child: Column(
@@ -90,17 +85,12 @@ class HomeScreen extends ConsumerWidget {
                             size: 48,
                           ),
                           const SizedBox(height: AppTheme.spacingMD),
-                          Text(
-                            'No ambiences found',
-                            style: AppTheme.headingSmall,
-                          ),
+                          Text('No ambiences found',
+                              style: AppTheme.headingSmall),
                           const SizedBox(height: AppTheme.spacingSM),
-                          Text(
-                            'Try a different search or filter',
-                            style: AppTheme.bodyMedium,
-                          ),
+                          Text('Try a different search or filter',
+                              style: AppTheme.bodyMedium),
                           const SizedBox(height: AppTheme.spacingLG),
-                          // Clear Filters Button
                           TextButton(
                             onPressed: () {
                               ref
@@ -120,10 +110,11 @@ class HomeScreen extends ConsumerWidget {
                     );
                   }
 
-                  // ── Ambience Grid ──────────────────────────
                   return GridView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingMD,
+                    padding: const EdgeInsets.only(
+                      left: AppTheme.spacingMD,
+                      right: AppTheme.spacingMD,
+                      bottom: 100, // space for mini player
                     ),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -142,7 +133,17 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
+
+        // ── Mini Player ───────────────────────────────
+        const Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: MiniPlayer(),
+        ),
+      ],
+    ),
+  ),
+);
   }
 }
