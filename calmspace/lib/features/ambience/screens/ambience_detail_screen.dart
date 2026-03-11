@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/ambience.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../player/screens/session_player_screen.dart';
 
 class AmbienceDetailScreen extends ConsumerWidget {
   final Ambience ambience;
@@ -194,6 +195,13 @@ class AmbienceDetailScreen extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: () {
                           // We'll wire this to session player later
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SessionPlayerScreen(ambience: ambience),
+                              ),
+                            );
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primary,
