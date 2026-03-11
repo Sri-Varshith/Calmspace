@@ -425,17 +425,32 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                       const SizedBox(height: AppTheme.spacingXL),
 
                       // End Session button
-                      TextButton(
-                        onPressed: _showEndSessionDialog,
-                        child: Text(
-                          'End Session',
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: Colors.white54,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white54,
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: _showEndSessionDialog,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: const BorderSide(
+                                color: Colors.white38,
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppTheme.spacingMD,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+                              ),
+                            ),
+                            child: Text(
+                              'End Session',
+                              style: AppTheme.bodyLarge.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
 
                       const SizedBox(height: AppTheme.spacingLG),
                     ],
