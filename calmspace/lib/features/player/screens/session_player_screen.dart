@@ -5,6 +5,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../audio_service.dart';
 import '../player_provider.dart';
 import 'package:just_audio/just_audio.dart';
+import 'dart:async';
 
 class SessionPlayerScreen extends ConsumerStatefulWidget {
   final Ambience ambience;
@@ -30,6 +31,7 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
   // Session timer
   int _elapsedSeconds = 0;
   bool _sessionEnded = false;
+  Timer? _sessionTimer;
 
   @override
   void initState() {
@@ -53,33 +55,11 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
     ));
   }
 
-  Future<void> _startSession() async {
-    // Start audio
-    await _audioService.loadAndPlay(widget.ambience.audioPath);
-
-    // Update session provider
-    ref.read(sessionProvider.notifier).startSession(widget.ambience);
-
-    // Start timer using position stream
-    _audioService.positionStream.listen((position) {
-      if (!mounted || _sessionEnded) return;
-
-      final elapsed = position.inSeconds % widget.ambience.durationSeconds;
-      final totalElapsed = _elapsedSeconds;
-
-      if (totalElapsed >= widget.ambience.durationSeconds) {
-        _onSessionComplete();
-        return;
-      }
-
-      setState(() {
-        _elapsedSeconds = position.inSeconds
-            .clamp(0, widget.ambience.durationSeconds);
-      });
-
-      ref.read(sessionProvider.notifier).updateElapsed(_elapsedSeconds);
-    });
-  }
+Future<void> _startSession() async {
+  await _audioService.loadAndPlay(widget.ambience.audioPath);
+  ref.read(sessionProvider.notifier).startSession(widget.ambience);
+  _startTimer(); // ← only this, remove everything below it
+}
 
   void _onSessionComplete() {
     if (_sessionEnded) return;
@@ -137,6 +117,27 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
     }
   }
 
+
+  void _startTimer() {
+  _sessionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (!mounted) {
+      timer.cancel();
+      return;
+    }
+
+    setState(() {
+      _elapsedSeconds++;
+    });
+
+    ref.read(sessionProvider.notifier).updateElapsed(_elapsedSeconds);
+
+    if (_elapsedSeconds >= widget.ambience.durationSeconds) {
+      timer.cancel();
+      _onSessionComplete();
+    }
+  });
+}
+
   void _navigateToReflection() {
     if (!mounted) return;
     Navigator.pushReplacement(
@@ -160,11 +161,12 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
     return '$m:$s';
   }
 
-  @override
-  void dispose() {
-    _breathingController.dispose();
-    super.dispose();
-  }
+@override
+void dispose() {
+  _sessionTimer?.cancel();
+  _breathingController.dispose();
+  super.dispose();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -392,10 +394,19 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                         builder: (context, snapshot) {
                           final isPlaying = snapshot.data?.playing ?? false;
                           return GestureDetector(
-                            onTap: () async {
-                              await _audioService.togglePlayPause();
-                              ref.read(sessionProvider.notifier).togglePlayPause();
-                            },
+onTap: () async {
+  final wasPlaying = _audioService.isPlaying;
+  await _audioService.togglePlayPause();
+  ref.read(sessionProvider.notifier).togglePlayPause();
+
+  if (wasPlaying) {
+    // WAS playing → now paused → cancel timer
+    _sessionTimer?.cancel();
+  } else {
+    // WAS paused → now playing → restart timer
+    _startTimer();
+  }
+},
                             child: Container(
                               width: 72,
                               height: 72,
