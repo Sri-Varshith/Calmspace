@@ -134,13 +134,7 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            widget.ambience.imagePath,
-            fit: BoxFit.cover,
-            cacheWidth: 800,
-            errorBuilder: (context, error, stack) =>
-                Container(color: AppTheme.background),
-          ),
+
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -162,8 +156,8 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 280 * _breathingAnimation.value + 100,
-                      height: 280 * _breathingAnimation.value + 100,
+                      width: 400 * _breathingAnimation.value + 100,
+                      height: 400 * _breathingAnimation.value + 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(colors: [
@@ -173,8 +167,8 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                       ),
                     ),
                     Container(
-                      width: 180 * _breathingAnimation.value + 80,
-                      height: 180 * _breathingAnimation.value + 80,
+                      width: 260 * _breathingAnimation.value + 80,
+                      height: 260 * _breathingAnimation.value + 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(colors: [
@@ -184,8 +178,8 @@ class _SessionPlayerScreenState extends ConsumerState<SessionPlayerScreen>
                       ),
                     ),
                     Container(
-                      width: 90,
-                      height: 90,
+                      width: 110,
+                      height: 110,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(colors: [
