@@ -1,6 +1,6 @@
 # CalmSpace 🌿
 
-A minimal, premium ambient soundscape app built as an interview assignment for **ArvyaX Flutter Developer** role.
+A minimal, premium ambient soundscape app.
 
 > _"Stillness is not the absence of sound — it's the presence of intention."_
 
